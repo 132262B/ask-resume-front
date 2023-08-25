@@ -77,7 +77,7 @@ const InputSelect = ({
     setIsOpen(isOpen => !isOpen);
   };
 
-  const filteredOptions = options.filter(option => {
+  const filteredOptions = options?.filter(option => {
     return getOptionName(option).toLowerCase().includes(inputValue.toLowerCase());
   });
 
@@ -108,6 +108,7 @@ const InputSelect = ({
             placeholder={placeholder}
             className={cn('_INPUT_', 'select')}
             id="dropdown-input"
+            autoComplete="false"
           />
           <button className={cn('_icon', height, { open: isOpen })} onClick={handleIconClick}>
             <Icon.Arrow

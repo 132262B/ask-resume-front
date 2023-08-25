@@ -1,6 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
+import { i18n, useTranslation } from 'next-i18next';
 
 import Text from 'shared-ui/src/components/Text';
 import { ColorMap } from 'shared-ui/src/config/colorMap';
@@ -17,6 +16,7 @@ import { useQueryParams } from 'common/hooks/router/useQueryParams';
 
 import styles from './index.module.scss';
 import { FormTranslateNamespaces } from '../constants';
+import Image from 'next/image';
 
 export interface UserInfoState {
   selectedJob: Option | null;
@@ -34,7 +34,7 @@ interface UserInfoProps {
 
 const UserInfo = ({ isMobile, jobs, userInfo, onChangeUserInfo }: UserInfoProps) => {
   const { t } = useTranslation(FormTranslateNamespaces);
-  const { locale } = useRouter().query as { locale: string };
+  const language = i18n.language;
 
   const LABEL_SIZE = isMobile ? 'medium' : 'large';
   const LABEL_WEIGHT = 'medium';
@@ -49,7 +49,7 @@ const UserInfo = ({ isMobile, jobs, userInfo, onChangeUserInfo }: UserInfoProps)
     { name: t('user_info.difficulty.hard'), value: 'hard' },
   ];
 
-  const pathname = `/${locale}/form`;
+  const pathname = `/${language}/form`;
   const { changeQueryParams } = useQueryParams();
   const isNavigationEnabled = !validateUserInfoForm(userInfo);
 
@@ -68,7 +68,7 @@ const UserInfo = ({ isMobile, jobs, userInfo, onChangeUserInfo }: UserInfoProps)
             labelSize: LABEL_SIZE,
           }}
           placeholder={t('user_info.placeholder.job') ?? ''}
-          locale={locale}
+          locale={language}
           height={isMobile ? 'md' : 'lg'}
         />
 
@@ -112,7 +112,7 @@ const UserInfo = ({ isMobile, jobs, userInfo, onChangeUserInfo }: UserInfoProps)
             <Text variant="block" size={LABEL_SIZE} weight="medium" textColor={ColorMap.blue_5}>
               {formatYearsOfCareer({
                 t,
-                locale,
+                locale: language,
                 selectedYearsOfCareer: userInfo.selectedYearsOfCareer,
               })}
             </Text>
@@ -128,21 +128,35 @@ const UserInfo = ({ isMobile, jobs, userInfo, onChangeUserInfo }: UserInfoProps)
           />
         </div>
 
-        <div
-          className={styles._button_wrapper}
-          onClick={() => {
-            if (isNavigationEnabled) return;
-            const query = { type: 'resume' };
-            changeQueryParams({ pathname, query });
-          }}
-        >
+        <div className={styles._button_wrapper}>
           <Button
             size={isMobile ? 'sm' : 'lg'}
             buttonColor="blue"
             disabled={isNavigationEnabled}
             label={{
-              labelText: t('button.next-page') ?? '',
-              labelTailingIcon: <Icon.Arrow flip />,
+              labelText: t('button.go_to_form') ?? '',
+              labelTailingIcon: <Icon.Write />,
+            }}
+            onClick={() => {
+              if (isNavigationEnabled) return;
+              const query = { type: 'resume' };
+              changeQueryParams({ pathname, query });
+            }}
+          />
+          <Button
+            size={isMobile ? 'sm' : 'lg'}
+            buttonColor="red"
+            disabled={isNavigationEnabled}
+            label={{
+              labelText: t('button.go_to_pdf') ?? '',
+              labelTailingIcon: (
+                <Image src="/images/icons/pdf-icon.svg" width={24} height={24} alt="Submit PDF" />
+              ),
+            }}
+            onClick={() => {
+              if (isNavigationEnabled) return;
+              const query = { type: 'pdf' };
+              changeQueryParams({ pathname, query });
             }}
           />
         </div>

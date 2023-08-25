@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'next-i18next';
+import { i18n, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import cn from 'classnames';
 import { uid } from 'react-uid';
@@ -17,7 +17,6 @@ import { UserInfoState } from './UserInfo';
 import { FormTranslateNamespaces } from 'modules/form/constants';
 import { calculateFormContents } from '../lib/confirmation';
 import { useGenerateInterviewQuestions } from 'modules/interviewQuestion/api/interviewQuestions';
-import { LanguageType } from 'common/types/api/languageType';
 
 export type ResumeInfoState = {
   select: Option;
@@ -41,23 +40,22 @@ interface ConfirmationProps {
 
 const Confirmation = ({ isMobile, userInfo, resumeInfo }: ConfirmationProps) => {
   const { t } = useTranslation(FormTranslateNamespaces);
-  const { locale } = useRouter().query as { locale: LanguageType };
   const { mutate } = useGenerateInterviewQuestions();
 
   const { changeQueryParams } = useQueryParams();
   const handlePrevPageClick = () => {
-    const pathname = `/${locale}/form`;
+    const pathname = `/form`;
     const query = { type: 'resume' };
     changeQueryParams({ pathname, query });
   };
 
   const handleSubmitClick = () => {
-    const pathname = `/${locale}/result`;
-    const calculatedFormContents = calculateFormContents({ locale, userInfo, resumeInfo });
+    const pathname = `/result`;
+    const calculatedFormContents = calculateFormContents({ userInfo, resumeInfo });
 
     // Call API : Generate Interview Questions
     mutate(
-      { form: calculatedFormContents, language: locale },
+      { form: calculatedFormContents },
       {
         onSuccess: () => {
           changeQueryParams({
@@ -92,7 +90,7 @@ const Confirmation = ({ isMobile, userInfo, resumeInfo }: ConfirmationProps) => 
           size={isMobile ? 'sm' : 'lg'}
           buttonColor="blue"
           label={{
-            labelText: t('button.submit') ?? '',
+            labelText: t('common:button.submit') ?? '',
             labelTailingIcon: <Icon.AirPlane />,
           }}
           onClick={handleSubmitClick}
